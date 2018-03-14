@@ -78,7 +78,7 @@ test('error before await next in middleware after http handler', async t => {
   app.register(HttpHandlerToken, expressApp);
 
   // Trigger error in downstream
-  app.middleware(async (ctx, next) => {
+  app.middleware(async () => {
     await Promise.resolve();
     throw new Error('FAIL');
   });
