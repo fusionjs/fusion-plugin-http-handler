@@ -22,6 +22,11 @@ test('http handler with express using send', async t => {
   });
   app.register(HttpHandlerToken, expressApp);
   app.middleware((ctx, next) => {
+    if (ctx.url === '/express') {
+      t.equal(ctx.res.statusCode, 200, 'express route sets status code');
+    } else {
+      t.equal(ctx.res.statusCode, 404, 'non express routes default to 404');
+    }
     ctx.req.secure = false;
     ctx.body = 'hit fallthrough';
     return next();

@@ -28,12 +28,23 @@ const plugin =
         }
         return new Promise((resolve, reject) => {
           const {req, res} = ctx;
+          // Default http response object behavior defaults res.statusCode to 200. Koa sets it to 404.
+          // This allows for http servers to use `end()` or express to use `send()` without specifying a 200 status code
+          const prevStatusCode = ctx.res.statusCode;
+          ctx.res.statusCode = 200;
           const listener = () => {
             ctx.respond = false;
-            return next().then(resolve);
+            return done();
           };
           res.on('end', listener);
+          res.on('finish', listener);
+
           handler(req, res, () => {
+            ctx.res.statusCode = prevStatusCode;
+            return done();
+          });
+
+          function done() {
             // Express mutates the req object to make this property non-writable.
             // We need to make it writable because other plugins (like koa-helmet) will set it
             Object.defineProperty(req, 'secure', {
@@ -41,10 +52,11 @@ const plugin =
               writable: true,
             });
             res.removeListener('end', listener);
+            res.removeListener('finish', listener);
             return next()
               .then(resolve)
               .catch(reject);
-          });
+          }
         });
       };
     },
