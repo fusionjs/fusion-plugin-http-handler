@@ -27,6 +27,7 @@ test('http handler with express using send', async t => {
     } else {
       t.equal(ctx.res.statusCode, 404, 'non express routes default to 404');
     }
+    // $FlowFixMe
     ctx.req.secure = false;
     ctx.body = 'hit fallthrough';
     return next();

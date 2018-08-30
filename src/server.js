@@ -47,7 +47,9 @@ const plugin =
           function done() {
             // Express mutates the req object to make this property non-writable.
             // We need to make it writable because other plugins (like koa-helmet) will set it
+            // $FlowFixMe
             Object.defineProperty(req, 'secure', {
+              // $FlowFixMe
               value: req.secure,
               writable: true,
             });
