@@ -34,8 +34,11 @@ const plugin =
           ctx.res.statusCode = 200;
           const listener = () => {
             // Makes koa-bodyparser compatible with bodyparser
+            // $FlowFixMe
             req._body = true;
+            // $FlowFixMe
             req.body = ctx.request.body;
+            // $FlowFixMe
             res.setHeader = () => {};
             ctx.respond = false;
             return done();
