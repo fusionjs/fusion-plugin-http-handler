@@ -33,6 +33,10 @@ const plugin =
           const prevStatusCode = ctx.res.statusCode;
           ctx.res.statusCode = 200;
           const listener = () => {
+            // Makes koa-bodyparser compatible with bodyparser
+            req._body = true;
+            req.body = ctx.request.body;
+            res.setHeader = () => {};
             ctx.respond = false;
             return done();
           };
