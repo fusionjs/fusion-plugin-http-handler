@@ -11,7 +11,7 @@
 import {createPlugin} from 'fusion-core';
 import type {FusionPlugin} from 'fusion-core';
 import {HttpHandlerToken} from './tokens.js';
-import type {DepsType, ServiceType} from './types.js';
+import type {DepsType} from './types.js';
 
 const plugin =
   __NODE__ &&
@@ -42,13 +42,14 @@ const plugin =
             // $FlowFixMe
             res.setHeader = () => {};
             ctx.respond = false;
-            return done();
+            done(null);
           };
           res.on('end', listener);
           res.on('finish', listener);
 
           handler(req, res, error => {
             ctx.res.statusCode = prevStatusCode;
+            // $FlowFixMe
             return done(error);
           });
 
@@ -73,4 +74,4 @@ const plugin =
     },
   });
 
-export default ((plugin: any): FusionPlugin<DepsType, ServiceType>);
+export default ((plugin: any): FusionPlugin<DepsType, void>);
