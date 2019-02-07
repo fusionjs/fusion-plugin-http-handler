@@ -22,9 +22,10 @@ const plugin =
 
     middleware: deps => {
       const {handler} = deps;
-      return (ctx, next) => {
+      return async (ctx, next) => {
+        await next();
         if (ctx.body) {
-          return next();
+          return;
         }
         return new Promise((resolve, reject) => {
           const {req, res} = ctx;
@@ -46,12 +47,12 @@ const plugin =
           res.on('end', listener);
           res.on('finish', listener);
 
-          handler(req, res, () => {
+          handler(req, res, error => {
             ctx.res.statusCode = prevStatusCode;
-            return done();
+            return done(error);
           });
 
-          function done() {
+          function done(error) {
             // Express mutates the req object to make this property non-writable.
             // We need to make it writable because other plugins (like koa-helmet) will set it
             // $FlowFixMe
@@ -62,9 +63,10 @@ const plugin =
             });
             res.removeListener('end', listener);
             res.removeListener('finish', listener);
-            return next()
-              .then(resolve)
-              .catch(reject);
+            if (error) {
+              return reject(error);
+            }
+            return resolve();
           }
         });
       };
